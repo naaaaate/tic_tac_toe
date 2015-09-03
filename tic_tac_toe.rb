@@ -29,210 +29,179 @@ class TicTacToe
     @player1 = gets.chomp
     puts "welcome #{@player1}"
     puts "You will be playing against the PC"
+    puts
     playerMove
   end
 
+
+  private
+
   def playerMove
     puts "please enter the number where you would like to place an X:"
+    puts
     # player enters number 1-9  --player1_move
-    player1_move = gets.chomp.to_i
-    # print player1_move
+    player1_move = gets.chomp
+
+
+    # we have .match which returns the letter or number that actually matches the regexp
+    # we have =~ which returns the index of the first thing that matches in the string
+    # we have === which returns true or false when comparing regexp against a string
+
+    # if playermove is a string digit 1-9..
+    if /[1-9]/ === player1_move
+    #   then convert it to integer..
+      # player1_move.to_i
+      # puts "yes.. the number is a string and matches 1-9"
+      if player1_move.length == 1
+        player1_move = player1_move.to_i
+      else
+        puts "you entered a number longer than 1 digit!..try again.."
+        puts
+        playerMove
+      end
+    # else if its a string letter or symbol..
+    else
+    #   then its a string so show message to enter a number ..
+      puts "U didnt enter a number..Please enter a number from 1-9!"
+      puts
+      playerMove
+    end
+
 
     # flatten the nested array game board
     @flat_board = @board.flatten
 
-    # program searches for index in the array of the number the player entered.
-    replace_num_with_x = @flat_board.index {|x| x == player1_move}
-
-    # program finds that number in the nested array and replaces it with an X
-    @flat_board[replace_num_with_x] = 'X'
-
-    # found = board.each_with_index do |row, i|
-    #   row.each_with_index do |number, j|
-    #      board[i][4]
-    #      board.index {board x == 4}
-    #   end
-    # end
+    #oohhh if u change position 1 to X .. then u ask for the index of 1 .. it wont find it bc its changed to X!!!!
 
 
-    # program checks for a win.
-
-    # new_board.each do |row|
-    #   if row = KEY
-    #     puts "TIC-TAC-TOE"
-    #     break
-    #   end
-    # end
-
-
-    #rebuild the nested array from flattened array..
-    @new_board = []
-    while !(@flat_board.empty?)
-      @board = @new_board.push(@flat_board.shift(3)) #so here flat_board is empty again.. fix that!
-    end
-
-    #show the board w X's
-    display_board
-
-
-    if checkWin == "WINNER!"
-      puts "Game Over... #{@player1} WINS!!!"
+    if @flat_board[player1_move-1] == 'X' || @flat_board[player1_move-1] == 'O'
+        puts "#{@player1}..that SPOT IS TAKEN.. Enter an open number please!"
+        display_board
+        puts
+        playerMove
     else
-      #switch player
-      # p @flat_board
-      pcMove
+
+      # program searches for index in the array of the number the player entered.
+      replace_num_with_x = @flat_board.index {|x| x == player1_move}
+      # program finds that number in the nested array and replaces it with an X
+      @flat_board[replace_num_with_x] = 'X'
+
+      #rebuild the nested array from flattened array..
+      @new_board = []
+      while !(@flat_board.empty?)
+        @board = @new_board.push(@flat_board.shift(3)) #so here flat_board is empty again.. fix that!
+      end
+
+      #show the board w X's
+      display_board
+
+      # check for a win.. if not switch to PC turn..
+      if checkWin == "WINNER!"
+        puts "Game Over... #{@player1} WINS!!!"
+      else
+        #switch player
+        pcMove
+      end
     end
   end
 
 
 
 
+
+  # check for a win..
   def checkWin
     if vertical_win || horizontal_win || diagonal_win || top_right_diagonal_win
      "WINNER!"
     end
   end
 
+  # build win conditions
+  def vertical_win
+    if @board.transpose.any? {|row| row == PC} || @board.transpose.any? {|row| row == KEY}
+      return true
+    end
+  end
 
-    private
-    # build win conditions
+  def horizontal_win
+    if @board.any? {|row| row == PC} || @board.any? {|row| row == KEY}
+      return true
+    end
+  end
 
-    def vertical_win
-      if @board.transpose.any? {|row| row == PC}
-        return true
+  def diagonal_win
+    test = @board.map.with_index { |row,i| 'X' if row[i] == 'X'}
+    other = @board.map.with_index { |row,i| 'O' if row[i] == 'O'}
+    if test == KEY || other == PC
+      return true
+    end
+  end
+
+  def top_right_diagonal_win
+    test = @board.reverse.map.with_index {|row,i| 'X' if row[i] == 'X' }
+    other = @board.reverse.map.with_index { |row,i| 'O' if row[i] == 'O'}
+    if test == KEY || other == PC
+      return true
+    end
+  end
+
+  # display the board..
+  def display_board
+    @board.each do |row|
+      row.each do |num|
+        print "#{num}\t"
       end
+    puts
     end
+  end
 
-    def horizontal_win
-      if @board.any? {|row| row == PC}
-        return true
-      end
-    end
 
-    def diagonal_win
-      test = @board.map.with_index { |row,i| 'X' if row[i] == 'X'}
-      other = @board.map.with_index { |row,i| 'O' if row[i] == 'O'}
-      test == KEY || other == PC
-    end
+  # PCs turn.
+  def pcMove
+    puts "pc will select random square..."
+    # pc enters RANDOM number bt the numbers left in the array.
+    randomNum = rand(9) + 1
+    @flat_board = @board.flatten
+    # p @flat_board
 
-    def top_right_diagonal_win
-      test = @board.reverse.map.with_index {|row,i| 'X' if row[i] == 'X' }
-      other = @board.map.with_index { |row,i| 'O' if row[i] == 'O'}
-      test == KEY || other == PC
-    end
+  # PC check board to make sure can play.. if no numbers 1-9 left on board, then game over.
+    if @flat_board.any? {|x| x.class == Fixnum}      #....its pc turn so check to make sure there are numbers left to choose from in the array..   .....nice! i figured that out!....
 
-    def display_board
-      @board.each do |row|
-        row.each do |num|
-          print "#{num}\t"
+      if @flat_board.include?(randomNum)  #...if the num pc chooses is in the array.. continue..
+
+      # program searches for index in the array of the number the pc entered.
+        pcNumIndex = @flat_board.index(randomNum)
+
+        #program will search for the number in the array in replace with a 'O'
+        @flat_board[pcNumIndex] = 'O'
+        # p @flat_board
+        @new_board = []
+        while !(@flat_board.empty?)
+          @board = @new_board << @flat_board.shift(3)
+          # p @board
         end
-      puts
-      end
-    end
-
-
-    # if theres a win.. end the game.. if not, pcs turn.
-    def pcMove
-      puts "pc will select random square..."
-      # pc enters RANDOM number bt the numbers left in the array.
-      randomNum = rand(9) + 1
-      @flat_board = @board.flatten
-      # p @flat_board
-
-    # PC check board to make sure can play.. if no numbers 1-9 left on board, then game over.
-      if @flat_board.any? {|x| x.class == Fixnum}      #....its pc turn so check to make sure there are numbers left to choose from in the array..   .....nice! i figured that out!....
-
-        if @flat_board.include?(randomNum)  #...if the num pc chooses in in the array.. continue..
-
-        # program searches for index in the array of the number the pc entered.
-          pcNumIndex = @flat_board.index(randomNum)
-
-          #program will search for the number in the array in replace with a 'O'
-          @flat_board[pcNumIndex] = 'O'
-          # p @flat_board
-          @new_board = []
-          while !(@flat_board.empty?)
-            @board = @new_board << @flat_board.shift(3)
-            # p @board
-          end
-          display_board
-          if checkWin == "WINNER!"
-            puts "Game Over.. PC WINS!!!"
-          else
-            playerMove
-          end
-        else #call pcMove again if PC chooses a number that has already been chosen!
-          pcMove
+        display_board
+        if checkWin == "WINNER!"
+          puts "Game Over.. PC WINS!!!"
+        else
+          playerMove
         end
-      else #if no more moves left on board output this..
-        puts "GAME OVER!.. NO MOVES LEFT"
+      else #call pcMove again if PC chooses a number that has already been chosen!
+        pcMove
       end
+    else #if no more moves left on board output this..
+      puts "GAME OVER!.. NO MOVES LEFT"
     end
-
-
-
-
-
-
-
-
-
-    # if that spot in the array does not have an X or an O , then replace that number with an O
-
-
-
-  #   @board.each_with_index do |row, i|
-  #     row.each do |number|
-  #       if @board[i][player1_move]
-  #       end
-  #     end
-  #   end
-  # end
-
+  end
 
 end
-
-
-
-
-
-
-
 
 board = [[1, 2, 3],
          [4, 5, 6],
          [7, 8, 9]]
 
-# make this a function call ...
-
 new_game = TicTacToe.new(board)
 new_game.intro
-new_game.checkWin
 
 
 
-
-
-
-
-# def test
-#     hash = {"B" => 0, "I" => 1, "N" => 2, "G" => 3, "O" => 4}
-#     bingoletter = hash[@letter]
-#     @board.each_with_index do |row_element, i|
-#       row_element.each do |number|
-#         if @board[i][bingoletter] == @num
-#              @board[i][bingoletter] = 'X'
-#         end
-#       end
-#     end
-#   end
-
-#   def display
-#     @board.each do |row_element|
-#       row_element.each do |number|
-#         print "#{number}\t"
-#       end
-#       puts  #prints new line and starts next subarray element
-#     end
-#   end
-# end
