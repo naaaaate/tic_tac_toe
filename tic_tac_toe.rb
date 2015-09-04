@@ -33,6 +33,7 @@ class TicTacToe
     puts "welcome #{@player1}"
     puts "You will be playing against the PC"
     puts
+    display_board
     playerMove
   end
 
