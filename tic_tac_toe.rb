@@ -62,6 +62,7 @@ class TicTacToe
         puts "you entered a number longer than 1 digit!..try again.."
         puts
         playerMove
+        abort() #need to jump out of recursive loop.
       end
     # else if its a string letter or symbol..
     else
@@ -69,11 +70,13 @@ class TicTacToe
       puts "U didnt enter a number..Please enter a number from 1-9!"
       puts
       playerMove
+      abort()
     end
 
     # flatten the nested array game board
     @flat_board = @board.flatten
 
+    p "*****" *10
     #SIDE NOTE: if u change position 1 to X .. then u ask for the index of 1 .. it wont find it bc its changed to X!!!!  That's why its erroring out.
 
     if @flat_board[player1_move - 1] == 'X' || @flat_board[player1_move - 1] == 'O'
