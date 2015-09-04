@@ -1,3 +1,5 @@
+# Pseudo-Code:
+
 # create TicTacToe class
   # initialize a board.. so that on creation of new instance of game a board is created
 # create a game board
@@ -15,6 +17,7 @@
 # in this game.. create a board
 # in this game.. see if theres a vertical win, horizontal win, diagonal win.
 # in this game.. type a number to replace it with an X and check for 3 x's win.
+# -----------------------------------------------------------------------------------------------------
 
 KEY = ['X','X','X']
 PC = ['O','O','O']
@@ -67,14 +70,12 @@ class TicTacToe
       playerMove
     end
 
-
     # flatten the nested array game board
     @flat_board = @board.flatten
 
-    #oohhh if u change position 1 to X .. then u ask for the index of 1 .. it wont find it bc its changed to X!!!!
+    #SIDE NOTE: if u change position 1 to X .. then u ask for the index of 1 .. it wont find it bc its changed to X!!!!  That's why its erroring out.
 
-
-    if @flat_board[player1_move-1] == 'X' || @flat_board[player1_move-1] == 'O'
+    if @flat_board[player1_move - 1] == 'X' || @flat_board[player1_move - 1] == 'O'
         puts "#{@player1}..that SPOT IS TAKEN.. Enter an open number please!"
         display_board
         puts
@@ -105,9 +106,43 @@ class TicTacToe
     end
   end
 
+  # PCs turn.
+  def pcMove
+    puts "pc will select random square..."
+    # pc enters RANDOM number bt the numbers left in the array.
+    randomNum = rand(9) + 1
+    @flat_board = @board.flatten
+    # p @flat_board
 
+    # PC check board to make sure can play.. if no numbers 1-9 left on board, then game over.
+    if @flat_board.any? {|x| x.class == Fixnum}      #....its pc turn so check to make sure there are numbers left to choose from in the array..   .....nice! i figured that out!....
 
+      if @flat_board.include?(randomNum)  #...if the num pc chooses is in the array.. continue..
 
+      # program searches for index in the array of the number the pc entered.
+        pcNumIndex = @flat_board.index(randomNum)
+
+        #program will search for the number in the array in replace with a 'O'
+        @flat_board[pcNumIndex] = 'O'
+        # p @flat_board
+        @new_board = []
+        while !(@flat_board.empty?)
+          @board = @new_board << @flat_board.shift(3)
+          # p @board
+        end
+        display_board
+        if checkWin == "WINNER!"
+          puts "Game Over.. PC WINS!!!"
+        else
+          playerMove
+        end
+      else #call pcMove again if PC chooses a number that has already been chosen!
+        pcMove
+      end
+    else #if no more moves left on board output this..
+      puts "GAME OVER!.. NO MOVES LEFT"
+    end
+  end
 
   # check for a win..
   def checkWin
@@ -154,52 +189,15 @@ class TicTacToe
     puts
     end
   end
-
-
-  # PCs turn.
-  def pcMove
-    puts "pc will select random square..."
-    # pc enters RANDOM number bt the numbers left in the array.
-    randomNum = rand(9) + 1
-    @flat_board = @board.flatten
-    # p @flat_board
-
-  # PC check board to make sure can play.. if no numbers 1-9 left on board, then game over.
-    if @flat_board.any? {|x| x.class == Fixnum}      #....its pc turn so check to make sure there are numbers left to choose from in the array..   .....nice! i figured that out!....
-
-      if @flat_board.include?(randomNum)  #...if the num pc chooses is in the array.. continue..
-
-      # program searches for index in the array of the number the pc entered.
-        pcNumIndex = @flat_board.index(randomNum)
-
-        #program will search for the number in the array in replace with a 'O'
-        @flat_board[pcNumIndex] = 'O'
-        # p @flat_board
-        @new_board = []
-        while !(@flat_board.empty?)
-          @board = @new_board << @flat_board.shift(3)
-          # p @board
-        end
-        display_board
-        if checkWin == "WINNER!"
-          puts "Game Over.. PC WINS!!!"
-        else
-          playerMove
-        end
-      else #call pcMove again if PC chooses a number that has already been chosen!
-        pcMove
-      end
-    else #if no more moves left on board output this..
-      puts "GAME OVER!.. NO MOVES LEFT"
-    end
-  end
-
 end
 
+
+#define the board..
 board = [[1, 2, 3],
          [4, 5, 6],
          [7, 8, 9]]
 
+# run the game..
 new_game = TicTacToe.new(board)
 new_game.intro
 
