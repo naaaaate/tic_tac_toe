@@ -33,7 +33,7 @@ class TicTacToe
     puts "welcome #{@player1}"
     puts "You will be playing against the PC"
     puts
-    display_board
+    # display_board
     playerMove
   end
 
@@ -42,6 +42,7 @@ class TicTacToe
 
   def playerMove
     puts "please enter the number where you would like to place an X:"
+    display_board
     puts
     # player enters number 1-9  --player1_move
     player1_move = gets.chomp
@@ -70,13 +71,14 @@ class TicTacToe
       puts "U didnt enter a number..Please enter a number from 1-9!"
       puts
       playerMove
-      abort()
+      abort() #need to jump out of recursive loop.
     end
 
     # flatten the nested array game board
     @flat_board = @board.flatten
 
-    p "*****" *10
+    # p "*****" *10 code keeps running here.. then errors out bc it is faulty after u jump out of recursive loop and win game..
+
     #SIDE NOTE: if u change position 1 to X .. then u ask for the index of 1 .. it wont find it bc its changed to X!!!!  That's why its erroring out.
 
     if @flat_board[player1_move - 1] == 'X' || @flat_board[player1_move - 1] == 'O'
